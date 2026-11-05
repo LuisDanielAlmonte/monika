@@ -19,11 +19,14 @@ La historia visual va de la duda a la confianza. Empieza en tonos oscuros con ni
 |---|---|---|
 | Siguiente / anterior | `→` `←` · `Espacio` · `PageDown` / `PageUp` (sirve con presentadores inalámbricos) | Clic a la derecha / izquierda · deslizar |
 | Pantalla completa | `F` | Botón en la barra inferior |
+| **Descargar en HTML** (un solo archivo, con fotos incluidas) | `D` | Botón **Descargar** |
 | Vista general de todas las diapositivas | `O` o `Esc` | Botón **Diapositivas** |
 | Ir a la diapositiva 1–9 | `1` … `9` | Puntos de la barra |
 | Primera / última | `Inicio` / `Fin` | |
 
 La barra inferior está oculta mientras presentas. Aparece al bajar el mouse al borde inferior. El cursor se esconde solo si no se mueve.
+
+**Descargar en HTML:** el botón **Descargar** arma un solo archivo `El-miedo-y-la-conducta.html` con estilos, fuentes y fotografías incluidas. Ese archivo funciona después sin internet. Conviene descargarlo desde GitHub Pages o desde `presentacion-offline.html` con internet, para que también se incluyan las fotos de Unsplash.
 
 **Exportar a PDF:** abrir en Chrome → `Ctrl + P` → *Guardar como PDF*, con **Gráficos de fondo** activado. Sale una diapositiva por página.
 
@@ -52,4 +55,11 @@ Cada diapositiva es un `<section class="slide">` en `index.html`, con un comenta
 
 - Tipografías **Lora** e **Inter**, licencia SIL Open Font License.
 - Ilustraciones e íconos dibujados en SVG para esta presentación.
+- Fotografías de [Unsplash](https://unsplash.com/license) (licencia libre de Unsplash):
+  - [Vitaly Gariev](https://unsplash.com/photos/a-group-of-people-sitting-around-a-table-talking-v-Tzi9nFzV8): grupo conversando (diapositiva 4)
+  - [Luan Cabral](https://unsplash.com/photos/man-and-woman-hugging-each-other-dS5-mzrtWeo): abrazo (diapositiva 5)
+  - [Jaykumar Bherwani](https://unsplash.com/photos/students-studying-together-at-a-long-table-Dg8WzlOE1as): estudiantes (diapositiva 12)
+  - [Eneko Uruñuela](https://unsplash.com/photos/woman-stretching-on-mountain-top-during-sunrise-I2YSmEUAgDY): amanecer en la montaña (diapositiva 14)
+
+  Estas fotos se cargan desde Unsplash, así que necesitan internet. Si no hay conexión, se muestra un fondo de color en su lugar. El archivo que genera **Descargar** sí las incluye.
 - Referencias citadas: Pittig et al. (2020); LeDoux y Daw (2018); Janis (1972); Tedeschi et al. (2021); Bandura (autoeficacia).
