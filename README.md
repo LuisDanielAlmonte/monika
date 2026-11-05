@@ -55,11 +55,8 @@ Cada diapositiva es un `<section class="slide">` en `index.html`, con un comenta
 
 - Tipografías **Lora** e **Inter**, licencia SIL Open Font License.
 - Ilustraciones e íconos dibujados en SVG para esta presentación.
-- Fotografías de [Unsplash](https://unsplash.com/license) (licencia libre de Unsplash):
+- Fotografía de [Unsplash](https://unsplash.com/license) (licencia libre de Unsplash):
   - [Vitaly Gariev](https://unsplash.com/photos/a-group-of-people-sitting-around-a-table-talking-v-Tzi9nFzV8): grupo conversando (diapositiva 4)
-  - [Luan Cabral](https://unsplash.com/photos/man-and-woman-hugging-each-other-dS5-mzrtWeo): abrazo (diapositiva 5)
-  - [Jaykumar Bherwani](https://unsplash.com/photos/students-studying-together-at-a-long-table-Dg8WzlOE1as): estudiantes (diapositiva 12)
-  - [Eneko Uruñuela](https://unsplash.com/photos/woman-stretching-on-mountain-top-during-sunrise-I2YSmEUAgDY): amanecer en la montaña (diapositiva 14)
 
-  Estas fotos se cargan desde Unsplash, así que necesitan internet. Si no hay conexión, se muestra un fondo de color en su lugar. El archivo que genera **Descargar** sí las incluye.
+  Esta foto se carga desde Unsplash, así que necesita internet. Si no hay conexión, se muestra un fondo de color en su lugar. El archivo que genera **Descargar** sí la incluye.
 - Referencias citadas: Pittig et al. (2020); LeDoux y Daw (2018); Janis (1972); Tedeschi et al. (2021); Bandura (autoeficacia).
