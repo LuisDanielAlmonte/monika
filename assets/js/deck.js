@@ -3,6 +3,9 @@
 (function () {
   'use strict';
 
+  // Copia intacta del documento, antes de que el script lo modifique (para "Descargar HTML")
+  const PRISTINE = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+
   const slides = [...document.querySelectorAll('.stage .slide')];
   const stage = document.getElementById('stage');
   const dots = document.getElementById('dots');
@@ -147,6 +150,89 @@
   document.getElementById('ovBtn').onclick = e => { e.stopPropagation(); ovOpen() ? closeOverview() : openOverview(); };
   ov.addEventListener('click', e => { if (e.target === ov) closeOverview(); });
 
+  /* ---------- Descargar HTML (un solo archivo con todo incluido) ---------- */
+  const toast = document.getElementById('toast');
+  let toastT = null;
+  function say(msg, ms) {
+    toast.textContent = msg;
+    toast.classList.add('on');
+    clearTimeout(toastT);
+    if (ms) toastT = setTimeout(() => toast.classList.remove('on'), ms);
+  }
+  const blobToDataURL = b => new Promise((ok, ko) => { const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = ko; r.readAsDataURL(b); });
+  async function toDataURL(url) {
+    const ctl = new AbortController();
+    const t = setTimeout(() => ctl.abort(), 15000);
+    const res = await fetch(url, { mode: 'cors', signal: ctl.signal }).finally(() => clearTimeout(t));
+    if (!res.ok) throw new Error(res.status + ' ' + url);
+    return blobToDataURL(await res.blob());
+  }
+  async function inlineCssUrls(css, base) {
+    const urls = [...new Set([...css.matchAll(/url\(\s*["']?([^"')]+)["']?\s*\)/g)].map(m => m[1]).filter(u => !u.startsWith('data:')))];
+    for (const u of urls) {
+      try { css = css.split(u).join(await toDataURL(new URL(u, base).href)); } catch (e) {}
+    }
+    return css;
+  }
+  async function buildStandalone() {
+    let html = PRISTINE;
+    const base = location.href;
+    // Hojas de estilo externas → <style>
+    for (const m of [...html.matchAll(/<link rel="stylesheet" href="([^"]+)">/g)]) {
+      const href = new URL(m[1], base).href;
+      let css = await (await fetch(href)).text();
+      css = await inlineCssUrls(css, href);
+      html = html.replace(m[0], () => '<style>\n' + css + '</style>');
+    }
+    // Scripts externos → <script>
+    for (const m of [...html.matchAll(/<script src="([^"]+)"><\/script>/g)]) {
+      const js = await (await fetch(new URL(m[1], base).href)).text();
+      html = html.replace(m[0], () => '<script>\n' + js + '<\/script>');
+    }
+    // Imágenes (locales y fotos de Unsplash) → data URI, para que funcione sin internet
+    const srcs = [...new Set([...html.matchAll(/<img[^>]+src="([^"]+)"/g)].map(m => m[1]).filter(u => !u.startsWith('data:')))];
+    let fails = 0;
+    const datas = await Promise.all(srcs.map(src =>
+      toDataURL(new URL(src.replace(/&amp;/g, '&'), base).href).catch(() => null)));
+    srcs.forEach((src, k) => {
+      if (datas[k]) html = html.split('src="' + src + '"').join('src="' + datas[k] + '"');
+      else fails++;
+    });
+    return { html, fails };
+  }
+  let busy = false;
+  async function download() {
+    if (busy) return;
+    busy = true;
+    say('Preparando la descarga…');
+    let html = null, fails = 0;
+    try { ({ html, fails } = await buildStandalone()); } catch (e) { html = null; }
+    if (!html) {
+      // Sin acceso a los archivos (por ejemplo, abierto con doble clic): descarga la versión offline publicada
+      if (location.protocol.startsWith('http')) {
+        const a = document.createElement('a');
+        a.href = 'presentacion-offline.html'; a.download = 'El-miedo-y-la-conducta.html';
+        document.body.appendChild(a); a.click(); a.remove();
+      } else if (!/<link rel="stylesheet" href=/.test(PRISTINE)) {
+        html = PRISTINE;          // ya es un archivo autocontenido
+      } else {
+        say('Abre presentacion-offline.html (o el link de GitHub Pages) para descargar', 5000);
+        busy = false;
+        return;
+      }
+    }
+    if (html) {
+      const url = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
+      const a = document.createElement('a');
+      a.href = url; a.download = 'El-miedo-y-la-conducta.html';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+    }
+    say(fails ? 'Descargado · ' + fails + ' foto(s) necesitan internet' : 'Descargado: El-miedo-y-la-conducta.html', 3500);
+    busy = false;
+  }
+  document.getElementById('dlBtn').onclick = e => { e.stopPropagation(); download(); };
+
   /* ---------- Teclado ---------- */
   addEventListener('keydown', e => {
     if (e.altKey || e.ctrlKey || e.metaKey) return;
@@ -160,13 +246,14 @@
     else if (k === 'Home') go(0);
     else if (k === 'End') go(slides.length - 1);
     else if (k === 'f' || k === 'F') toggleFs();
+    else if (k === 'd' || k === 'D') download();
     else if (k === 'o' || k === 'O' || k === 'Escape') { if (k !== 'Escape' || !isFs()) openOverview(); }
     else if (/^[1-9]$/.test(k)) go(+k - 1);
   });
 
   /* ---------- Clic y deslizar ---------- */
   addEventListener('click', e => {
-    if (ovOpen() || e.target.closest('.ui')) return;
+    if (!e.isTrusted || ovOpen() || e.target.closest('.ui, a, button')) return;
     (e.clientX > innerWidth / 3) ? next() : prev();
   });
   let tx = null, ty = null;
